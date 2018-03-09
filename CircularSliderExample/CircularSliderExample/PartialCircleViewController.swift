@@ -17,16 +17,16 @@ class PartialCircleViewController: UIViewController {
     super.viewDidLoad()
     
     // init slider view
-    let frame = CGRectMake(0, 0, sliderView.frame.width, sliderView.frame.height)
+    let frame = CGRect(x: 0, y: 0, width: sliderView.frame.width, height: sliderView.frame.height)
     let circularSlider = CircularSlider(frame: frame)
     
     // setup target to watch for value change
-    circularSlider.addTarget(self, action: #selector(PartialCircleViewController.valueChanged(_:)), forControlEvents: UIControlEvents.ValueChanged)
+    circularSlider.addTarget(self, action: #selector(PartialCircleViewController.valueChanged(_:)), for: UIControlEvents.valueChanged)
     
     // NOTE: sliderMaximumAngle must be set before currentValue
     circularSlider.maximumAngle = 270.0
-    circularSlider.unfilledArcLineCap = .Round
-    circularSlider.filledArcLineCap = .Round
+    circularSlider.unfilledArcLineCap = .round
+    circularSlider.filledArcLineCap = .round
     circularSlider.currentValue = 10
     circularSlider.lineWidth = 30
     
@@ -37,7 +37,7 @@ class PartialCircleViewController: UIViewController {
     circularSlider.transform = circularSlider.getRotationalTransform()
   }
   
-  func valueChanged(slider: CircularSlider) {
+  func valueChanged(_ slider: CircularSlider) {
     sliderValueLabel.text = "\(slider.currentValue)"
   }
 }

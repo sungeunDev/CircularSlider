@@ -20,21 +20,21 @@ class DoubleHandleCircularSlider: CircularSlider {
       assert(newValue <= maximumValue && newValue >= minimumValue, "current value \(newValue) must be between minimumValue \(minimumValue) and maximumValue \(maximumValue)")
       // Update the upperAngleFromNorth to match this newly set value
       upperAngleFromNorth = Int((newValue * Float(maximumAngle)) / (maximumValue - minimumValue))
-      sendActionsForControlEvents(UIControlEvents.ValueChanged)
+      sendActions(for: UIControlEvents.valueChanged)
     } get {
       return (Float(upperAngleFromNorth) * (maximumValue - minimumValue)) / Float(maximumAngle)
     }
   }
   
-  private var upperAngleFromNorth: Int = 30 {
+  fileprivate var upperAngleFromNorth: Int = 30 {
     didSet {
       assert(upperAngleFromNorth >= 0, "upperAngleFromNorth \(upperAngleFromNorth) must be greater than 0")
     }
   }
   
   // MARK: - Drawing Methods
-  override func drawRect(rect: CGRect) {
-    super.drawRect(rect)
+  override func draw(_ rect: CGRect) {
+    super.draw(rect)
     let ctx = UIGraphicsGetCurrentContext()
     
     // Draw the second draggable 'handle'
@@ -42,7 +42,7 @@ class DoubleHandleCircularSlider: CircularSlider {
     secondCircularSliderHandle.frame = super.drawHandle(ctx!, atPoint: handleCenter)
   }
   
-  override func drawLine(ctx: CGContextRef) {
+  override func drawLine(_ ctx: CGContext) {
     unfilledColor.set()
     // Draw an unfilled circle (this shows what can be filled)
     CircularTrig.drawUnfilledCircleInContext(ctx, center: centerPoint, radius: computedRadius, lineWidth: CGFloat(lineWidth), maximumAngle: maximumAngle, lineCap: unfilledArcLineCap)
@@ -53,8 +53,8 @@ class DoubleHandleCircularSlider: CircularSlider {
   }
   
   // MARK: - UIControl Functions
-  override func beginTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
-    let location = touch.locationInView(self)
+  override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    let location = touch.location(in: self)
 
     if pointInsideHandle(pointOnCircleAtAngleFromNorth(angleFromNorth), point: location, withEvent: event!) {
       circularSliderHandle.highlighted = true
@@ -65,9 +65,9 @@ class DoubleHandleCircularSlider: CircularSlider {
     return secondCircularSliderHandle.highlighted || circularSliderHandle.highlighted
   }
   
-  override func continueTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
+  override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
     
-    let lastPoint = touch.locationInView(self)
+    let lastPoint = touch.location(in: self)
     let lastAngle = floor(CircularTrig.angleRelativeToNorthFromPoint(centerPoint, toPoint: lastPoint))
     
     if circularSliderHandle.highlighted {
@@ -76,17 +76,17 @@ class DoubleHandleCircularSlider: CircularSlider {
       moveUpperHandle(lastAngle)
     }
     
-    sendActionsForControlEvents(UIControlEvents.ValueChanged)
+    sendActions(for: UIControlEvents.valueChanged)
     
     return true
   }
   
-  override func endTrackingWithTouch(touch: UITouch?, withEvent event: UIEvent?) {
+  override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
     circularSliderHandle.highlighted = false
     secondCircularSliderHandle.highlighted = false
   }
   
-  private func moveLowerHandle(newAngleFromNorth: CGFloat) {
+  fileprivate func moveLowerHandle(_ newAngleFromNorth: CGFloat) {
     let conditionOne = newAngleFromNorth > maximumAngle
     let conditionTwo = newAngleFromNorth > (CGFloat(upperAngleFromNorth) - minimumHandleDistance)
     
@@ -107,7 +107,7 @@ class DoubleHandleCircularSlider: CircularSlider {
     setNeedsDisplay()
   }
   
-  private func moveUpperHandle(newAngleFromNorth: CGFloat) {
+  fileprivate func moveUpperHandle(_ newAngleFromNorth: CGFloat) {
     let conditionOne = newAngleFromNorth > maximumAngle
     let conditionTwo = newAngleFromNorth < CGFloat(angleFromNorth) + minimumHandleDistance
     
@@ -130,7 +130,7 @@ class DoubleHandleCircularSlider: CircularSlider {
   
   // MARK: - Helper Methods
   
-  private func pointInsideHandle(handleCenter: CGPoint, point: CGPoint, withEvent event: UIEvent) -> Bool {
+  fileprivate func pointInsideHandle(_ handleCenter: CGPoint, point: CGPoint, withEvent event: UIEvent) -> Bool {
     // Adhere to apple's design guidelines - avoid making touch targets smaller than 44 points
     let handleRadius = max(handleWidth, 44.0) * 0.5
     

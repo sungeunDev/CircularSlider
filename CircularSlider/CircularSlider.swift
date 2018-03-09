@@ -10,10 +10,10 @@ import QuartzCore
 import Foundation
 
 enum CircularSliderHandleType {
-  case SemiTransparentWhiteSmallCircle,
-  SemiTransparentWhiteCircle,
-  SemiTransparentBlackCircle,
-  BigCircle
+  case semiTransparentWhiteSmallCircle,
+  semiTransparentWhiteCircle,
+  semiTransparentBlackCircle,
+  bigCircle
 }
 
 class CircularSlider: UIControl {
@@ -50,7 +50,8 @@ class CircularSlider: UIControl {
       assert(newValue <= maximumValue && newValue >= minimumValue, "current value \(newValue) must be between minimumValue \(minimumValue) and maximumValue \(maximumValue)")
       // Update the angleFromNorth to match this newly set value
       angleFromNorth = Int((newValue * Float(maximumAngle)) / (maximumValue - minimumValue))
-      sendActionsForControlEvents(UIControlEvents.ValueChanged)
+      moveHandle(CGFloat(angleFromNorth))
+      sendActions(for: UIControlEvents.valueChanged)
     } get {
         return (Float(angleFromNorth) * (maximumValue - minimumValue)) / Float(maximumAngle)
     }
@@ -72,7 +73,7 @@ class CircularSlider: UIControl {
   }
   
   // Type of the handle to display to represent draggable current value
-  var handleType: CircularSliderHandleType = .SemiTransparentWhiteSmallCircle {
+  var handleType: CircularSliderHandleType = .semiTransparentWhiteSmallCircle {
     didSet {
       setNeedsUpdateConstraints()
       setNeedsDisplay()
@@ -108,28 +109,28 @@ class CircularSlider: UIControl {
   }
   
   // Color of filled portion of line (from North/midnight start to currentValue)
-  var filledColor: UIColor = .redColor() {
+  var filledColor: UIColor = .red {
     didSet {
       setNeedsDisplay()
     }
   }
   
  // Color of unfilled portion of line (from currentValue to North/midnight end)
-  var unfilledColor: UIColor = .blackColor() {
+  var unfilledColor: UIColor = .black {
     didSet {
       setNeedsDisplay()
     }
   }
 
   // Font of the inner marking labels within the circle
-  var labelFont: UIFont = .systemFontOfSize(10.0) {
+  var labelFont: UIFont = .systemFont(ofSize: 10.0) {
     didSet {
       setNeedsDisplay()
     }
   }
   
   // Color of the inner marking labels within the circle
-  var labelColor: UIColor = .redColor() {
+  var labelColor: UIColor = .red {
     didSet {
       setNeedsDisplay()
     }
@@ -143,10 +144,10 @@ class CircularSlider: UIControl {
   
   // type of LineCap to use for the unfilled arc
   // NOTE: user CGLineCap.Butt for full circles
-  var unfilledArcLineCap: CGLineCap = .Butt
+  var unfilledArcLineCap: CGLineCap = .butt
   
   // type of CGLineCap to use for the arc that is filled in as the handle moves
-  var filledArcLineCap: CGLineCap = .Butt
+  var filledArcLineCap: CGLineCap = .butt
   
   // MARK: Computed Public Properties
   var computedRadius: CGFloat {
@@ -162,7 +163,7 @@ class CircularSlider: UIControl {
   }
   
   var centerPoint: CGPoint {
-    return CGPointMake(bounds.size.width * 0.5, bounds.size.height * 0.5)
+    return CGPoint(x: bounds.size.width * 0.5, y: bounds.size.height * 0.5)
   }
   
   var angleFromNorth: Int = 0 {
@@ -173,39 +174,39 @@ class CircularSlider: UIControl {
   
   var handleWidth: CGFloat {
     switch handleType {
-    case .SemiTransparentWhiteSmallCircle:
+    case .semiTransparentWhiteSmallCircle:
       return CGFloat(lineWidth / 2)
-    case .SemiTransparentWhiteCircle, .SemiTransparentBlackCircle:
+    case .semiTransparentWhiteCircle, .semiTransparentBlackCircle:
       return CGFloat(lineWidth)
-    case .BigCircle:
+    case .bigCircle:
       return CGFloat(lineWidth + 5) // 5 points bigger than standard handles
     }
   }
 
   // MARK: Private Variables
-  private var radius: CGFloat = -1.0 {
+  fileprivate var radius: CGFloat = -1.0 {
     didSet {
       setNeedsUpdateConstraints()
       setNeedsDisplay()
     }
   }
   
-  private var computedHandleColor: UIColor? {
+  fileprivate var computedHandleColor: UIColor? {
     var newHandleColor = handleColor
     
     switch (handleType) {
-    case .SemiTransparentWhiteSmallCircle, .SemiTransparentWhiteCircle:
+    case .semiTransparentWhiteSmallCircle, .semiTransparentWhiteCircle:
       newHandleColor = UIColor(white: 1.0, alpha: 0.7)
-    case .SemiTransparentBlackCircle:
+    case .semiTransparentBlackCircle:
       newHandleColor = UIColor(white: 0.0, alpha: 0.7)
-    case .BigCircle:
+    case .bigCircle:
       newHandleColor = filledColor
     }
     
     return newHandleColor
   }
   
-  private var innerLabelRadialDistanceFromCircumference: CGFloat {
+  fileprivate var innerLabelRadialDistanceFromCircumference: CGFloat {
     // Labels should be moved far enough to clear the line itself plus a fixed offset (relative to radius).
     var distanceToMoveInwards = 0.1 * -(radius) - 0.5 * CGFloat(lineWidth)
     distanceToMoveInwards -= 0.5 * labelFont.pointSize // Also account for variable font size.
@@ -215,12 +216,12 @@ class CircularSlider: UIControl {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = .clearColor()
+    backgroundColor = .clear
   }
 
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-    backgroundColor = .clearColor()
+    backgroundColor = .clear
   }
   
   // TODO: initializer for autolayout
@@ -236,7 +237,7 @@ class CircularSlider: UIControl {
 //  }
   
   // MARK: - Function Overrides
-  override func intrinsicContentSize() -> CGSize {
+  override var intrinsicContentSize : CGSize {
     // Total width is: diameter + (2 * MAX(halfLineWidth, halfHandleWidth))
     let diameter = radius * 2
     let halfLineWidth = ceilf(Float(lineWidth) / 2.0)
@@ -244,11 +245,11 @@ class CircularSlider: UIControl {
     
     let widthWithHandle = diameter + CGFloat(2 *  max(halfHandleWidth, halfLineWidth))
     
-    return CGSizeMake(widthWithHandle, widthWithHandle)
+    return CGSize(width: widthWithHandle, height: widthWithHandle)
   }
   
-  override func drawRect(rect: CGRect) {
-    super.drawRect(rect)
+  override func draw(_ rect: CGRect) {
+    super.draw(rect)
     let ctx = UIGraphicsGetCurrentContext()
     
     // Draw the circular lines that slider handle moves along
@@ -262,7 +263,7 @@ class CircularSlider: UIControl {
     drawInnerLabels(ctx!, rect: rect)
   }
   
-  override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
+  override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
     guard event != nil else { return false }
     
     if pointInsideHandle(point, withEvent: event!) {
@@ -272,7 +273,7 @@ class CircularSlider: UIControl {
     }
   }
   
-  private func pointInsideCircle(point: CGPoint, withEvent event: UIEvent) -> Bool {
+  fileprivate func pointInsideCircle(_ point: CGPoint, withEvent event: UIEvent) -> Bool {
     let p1 = centerPoint
     let p2 = point
     let xDist = p2.x - p1.x
@@ -281,7 +282,7 @@ class CircularSlider: UIControl {
     return distance < computedRadius + CGFloat(lineWidth) * 0.5
   }
 
-  private func pointInsideHandle(point: CGPoint, withEvent event: UIEvent) -> Bool {
+  fileprivate func pointInsideHandle(_ point: CGPoint, withEvent event: UIEvent) -> Bool {
     let handleCenter = pointOnCircleAtAngleFromNorth(angleFromNorth)
     // Adhere to apple's design guidelines - avoid making touch targets smaller than 44 points
     let handleRadius = max(handleWidth, 44.0) * 0.5
@@ -293,7 +294,7 @@ class CircularSlider: UIControl {
   }
   
   // MARK: - Drawing methods
-  func drawLine(ctx: CGContextRef) {
+  func drawLine(_ ctx: CGContext) {
     unfilledColor.set()
     // Draw an unfilled circle (this shows what can be filled)
     CircularTrig.drawUnfilledCircleInContext(ctx, center: centerPoint, radius: computedRadius, lineWidth: CGFloat(lineWidth), maximumAngle: maximumAngle, lineCap: unfilledArcLineCap)
@@ -303,8 +304,8 @@ class CircularSlider: UIControl {
     CircularTrig.drawUnfilledArcInContext(ctx, center: centerPoint, radius: computedRadius, lineWidth: CGFloat(lineWidth), fromAngleFromNorth: 0, toAngleFromNorth: CGFloat(angleFromNorth), lineCap: filledArcLineCap)
   }
   
-  func drawHandle(ctx: CGContextRef, atPoint handleCenter: CGPoint) -> CGRect {
-    CGContextSaveGState(ctx)
+  func drawHandle(_ ctx: CGContext, atPoint handleCenter: CGPoint) -> CGRect {
+    ctx.saveGState()
     var frame: CGRect!
     
     // Ensure that handle is drawn in the correct color
@@ -313,35 +314,34 @@ class CircularSlider: UIControl {
     
     frame = CircularTrig.drawFilledCircleInContext(ctx, center: handleCenter, radius: 0.5 * handleWidth)
     
-    CGContextSaveGState(ctx)
+    ctx.saveGState()
     return frame
   }
   
-  func drawInnerLabels(ctx: CGContextRef, rect: CGRect) {
-    if let labels = innerMarkingLabels where labels.count > 0 {
-      let attributes = [NSFontAttributeName: labelFont, NSForegroundColorAttributeName: labelColor]
+  func drawInnerLabels(_ ctx: CGContext, rect: CGRect) {
+    if let labels = innerMarkingLabels, labels.count > 0 {
+      let attributes = [NSFontAttributeName: labelFont, NSForegroundColorAttributeName: labelColor] as [String : Any]
       
       // Enumerate through labels clockwise
-      for (var i = 0; i < labels.count; i++) {
-        let label = labels[i] as NSString
-        let labelFrame = contextCoordinatesForLabelAtIndex(i)
+      for (index, label) in labels.enumerated() {
+        let labelFrame = contextCoordinatesForLabel(atIndex: index)
         
-        CGContextSaveGState(ctx)
+        ctx.saveGState()
         
         // invert transformation used on arc
-        CGContextConcatCTM(ctx, CGAffineTransformMakeTranslation(labelFrame.origin.x + (labelFrame.width / 2), labelFrame.origin.y + (labelFrame.height / 2)))
-        CGContextConcatCTM(ctx, CGAffineTransformInvert(getRotationalTransform()))
-        CGContextConcatCTM(ctx, CGAffineTransformMakeTranslation(-(labelFrame.origin.x + (labelFrame.width / 2)), -(labelFrame.origin.y + (labelFrame.height / 2))))
+        ctx.concatenate(CGAffineTransform(translationX: labelFrame.origin.x + (labelFrame.width / 2), y: labelFrame.origin.y + (labelFrame.height / 2)))
+        ctx.concatenate(getRotationalTransform().inverted())
+        ctx.concatenate(CGAffineTransform(translationX: -(labelFrame.origin.x + (labelFrame.width / 2)), y: -(labelFrame.origin.y + (labelFrame.height / 2))))
         
         // draw label
-        label.drawInRect(labelFrame, withAttributes: attributes)
+        label.draw(in: labelFrame, withAttributes: attributes)
         
-        CGContextRestoreGState(ctx)
+        ctx.restoreGState()
       }
     }
   }
   
-  func contextCoordinatesForLabelAtIndex(index: Int) -> CGRect {
+  func contextCoordinatesForLabel(atIndex index: Int) -> CGRect {
     let label = innerMarkingLabels![index]
     var percentageAlongCircle: CGFloat!
     
@@ -358,10 +358,10 @@ class CircularSlider: UIControl {
     let labelSize = sizeOfString(label, withFont: labelFont)
     let offsetFromCircle = offsetFromCircleForLabelAtIndex(index, withSize: labelSize)
     
-    return CGRectMake(pointOnCircle.x + offsetFromCircle.x, pointOnCircle.y + offsetFromCircle.y, labelSize.width, labelSize.height)
+    return CGRect(x: pointOnCircle.x + offsetFromCircle.x, y: pointOnCircle.y + offsetFromCircle.y, width: labelSize.width, height: labelSize.height)
   }
   
-  func offsetFromCircleForLabelAtIndex(index: Int, withSize labelSize: CGSize) -> CGPoint {
+  func offsetFromCircleForLabelAtIndex(_ index: Int, withSize labelSize: CGSize) -> CGPoint {
     // Determine how many degrees around the full circle this label should go
     let percentageAlongCircle = ((100.0 / CGFloat(innerMarkingLabels!.count - 1)) * CGFloat(index)) / 100.0
     let degreesFromNorthForLabel = percentageAlongCircle * maximumAngle
@@ -369,21 +369,21 @@ class CircularSlider: UIControl {
     let radialDistance = innerLabelRadialDistanceFromCircumference + labelDisplacement
     let inwardOffset = CircularTrig.pointOnRadius(radialDistance, atAngleFromNorth: CGFloat(degreesFromNorthForLabel))
     
-    return CGPointMake(-labelSize.width * 0.5 + inwardOffset.x, -labelSize.height * 0.5 + inwardOffset.y)
+    return CGPoint(x: -labelSize.width * 0.5 + inwardOffset.x, y: -labelSize.height * 0.5 + inwardOffset.y)
   }
   
   // MARK: - UIControl Functions
-  override func continueTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
-    let lastPoint = touch.locationInView(self)
+  override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    let lastPoint = touch.location(in: self)
     let lastAngle = floor(CircularTrig.angleRelativeToNorthFromPoint(centerPoint, toPoint: lastPoint))
 
     moveHandle(lastAngle)
-    sendActionsForControlEvents(UIControlEvents.ValueChanged)
+    sendActions(for: UIControlEvents.valueChanged)
     
     return true
   }
   
-  private func moveHandle(newAngleFromNorth: CGFloat) {
+  fileprivate func moveHandle(_ newAngleFromNorth: CGFloat) {
     
     // prevent slider from moving past maximumAngle
     if newAngleFromNorth > maximumAngle {
@@ -401,12 +401,12 @@ class CircularSlider: UIControl {
   }
   
   // MARK: - Helper Functions
-  func pointOnCircleAtAngleFromNorth(angleFromNorth: Int) -> CGPoint {
+  func pointOnCircleAtAngleFromNorth(_ angleFromNorth: Int) -> CGPoint {
     let offset = CircularTrig.pointOnRadius(computedRadius, atAngleFromNorth: CGFloat(angleFromNorth))
-    return CGPointMake(centerPoint.x + offset.x, centerPoint.y + offset.y)
+    return CGPoint(x: centerPoint.x + offset.x, y: centerPoint.y + offset.y)
   }
   
-  func sizeOfString(string: String, withFont font: UIFont) -> CGSize {
+  func sizeOfString(_ string: String, withFont font: UIFont) -> CGSize {
     let attributes = [NSFontAttributeName: font]
     return NSAttributedString(string: string, attributes: attributes).size()
   }
@@ -414,12 +414,12 @@ class CircularSlider: UIControl {
   func getRotationalTransform() -> CGAffineTransform {
     if maximumAngle == 360 {
       // do not perform a rotation if using a full circle slider
-      let transform = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(0))
+      let transform = CGAffineTransform.identity.rotated(by: CGFloat(0))
       return transform
     } else {
       // rotate slider view so "north" is at the start
-      let radians = Double(-(maximumAngle / 2)) / 180.0 * M_PI
-      let transform = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(radians))
+      let radians = Double(-(maximumAngle / 2)) / 180.0 * Double.pi
+      let transform = CGAffineTransform.identity.rotated(by: CGFloat(radians))
       return transform
     }
   }

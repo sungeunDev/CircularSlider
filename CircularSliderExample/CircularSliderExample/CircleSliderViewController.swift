@@ -17,14 +17,14 @@ class CircleSliderViewController: UIViewController {
     super.viewDidLoad()
     
     // init slider view
-    let frame = CGRectMake(0, 0, sliderView.frame.width, sliderView.frame.height)
+    let frame = CGRect(x: 0, y: 0, width: sliderView.frame.width, height: sliderView.frame.height)
     let circularSlider = CircularSlider(frame: frame)
     
     // setup target to watch for value change
-    circularSlider.addTarget(self, action: #selector(CircleSliderViewController.valueChanged(_:)), forControlEvents: UIControlEvents.ValueChanged)
+    circularSlider.addTarget(self, action: #selector(CircleSliderViewController.valueChanged(_:)), for: UIControlEvents.valueChanged)
     
     // setup slider defaults
-    circularSlider.handleType = .BigCircle
+    circularSlider.handleType = .bigCircle
     circularSlider.currentValue = 10
     circularSlider.lineWidth = 10
     
@@ -32,7 +32,7 @@ class CircleSliderViewController: UIViewController {
     sliderView.addSubview(circularSlider)
   }
   
-  func valueChanged(slider: CircularSlider) {
+  func valueChanged(_ slider: CircularSlider) {
     sliderValueLabel.text = "\(slider.currentValue)"
   }
 }

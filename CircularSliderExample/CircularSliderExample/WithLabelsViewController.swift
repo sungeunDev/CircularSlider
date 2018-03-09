@@ -17,17 +17,17 @@ class WithLabelsViewController: UIViewController {
     super.viewDidLoad()
     
     // init slider view
-    let frame = CGRectMake(0, 0, sliderView.frame.width, sliderView.frame.height)
+    let frame = CGRect(x: 0, y: 0, width: sliderView.frame.width, height: sliderView.frame.height)
     let circularSlider = CircularSlider(frame: frame)
     
     // setup target to watch for value change
-    circularSlider.addTarget(self, action: #selector(WithLabelsViewController.valueChanged(_:)), forControlEvents: UIControlEvents.ValueChanged)
+    circularSlider.addTarget(self, action: #selector(WithLabelsViewController.valueChanged(_:)), for: UIControlEvents.valueChanged)
     
     // setup slider defaults
     circularSlider.maximumAngle = 270.0
-    circularSlider.unfilledArcLineCap = .Round
-    circularSlider.filledArcLineCap = .Round
-    circularSlider.handleType = .BigCircle
+    circularSlider.unfilledArcLineCap = .round
+    circularSlider.filledArcLineCap = .round
+    circularSlider.handleType = .bigCircle
     circularSlider.currentValue = 10
     circularSlider.lineWidth = 10
     circularSlider.labelDisplacement = -10.0
@@ -40,7 +40,7 @@ class WithLabelsViewController: UIViewController {
     circularSlider.transform = circularSlider.getRotationalTransform()
   }
   
-  func valueChanged(slider: CircularSlider) {
+  func valueChanged(_ slider: CircularSlider) {
     sliderValue.text = "\(slider.currentValue)"
   }
 }

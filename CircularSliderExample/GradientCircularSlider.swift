@@ -9,13 +9,13 @@ import UIKit
 
 class GradientCircularSlider: CircularSlider {
   // Array with two colors to create gradation between
-  var unfilledGradientColors: [UIColor] = [.blackColor(), .lightGrayColor()] {
+  var unfilledGradientColors: [UIColor] = [.black, .lightGray] {
     didSet {
       setNeedsDisplay()
     }
   }
   
-  override func drawLine(ctx: CGContextRef) {
+  override func drawLine(_ ctx: CGContext) {
     if unfilledGradientColors.count == 2 {
       CircularTrig.drawUnfilledGradientArcInContext(ctx, center: centerPoint, radius: computedRadius, lineWidth: CGFloat(lineWidth), maximumAngle: maximumAngle , colors: unfilledGradientColors, lineCap: unfilledArcLineCap)
     } else {
